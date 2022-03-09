@@ -23,3 +23,44 @@ Use your rule with different projects and describe you findings below. See the [
 
 ## Answer
 
+On peut appliquer la règle suivante :
+`//IfStatement[.//IfStatement[.//IfStatement]]`
+```XML
+<rule name=""
+      language="java"
+      message=""
+      class="net.sourceforge.pmd.lang.rule.XPathRule">
+   <description>
+
+   </description>
+   <priority>3</priority>
+   <properties>
+      <property name="version" value="2.0"/>
+      <property name="xpath">
+         <value>
+<![CDATA[
+//IfStatement[.//IfStatement[.//IfStatement]]
+]]>
+         </value>
+      </property>
+   </properties>
+</rule>
+```
+
+Par exemple sur le code suivant on matche bien les deux premiers nodes:
+```JAVA
+public class test {
+    public static void prout(){
+        int pouet = 0;
+        if (true) {
+            if (false){
+                if (pouet == 0) {
+                    if (pouet == 2) {
+                        System.out.println(pouet);
+                    }
+                }
+            }
+        }
+    }
+}
+```
