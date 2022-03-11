@@ -27,3 +27,11 @@ The program should take as input the path to the source code of the project. It 
 Include in this repository the code of your application. Remove all unnecessary files like compiled binaries. See the [instructions](../sujet.md) for suggestions on the projects to use.
 
 *Disclaimer* In a real project not all fields need to be accessed with a public getter.
+
+## Answer
+Ligne de commande a utiliser:
+```
+java -jar javaparser-starter.jar fr.istic.vv.Main "C:\Users\boris\IdeaProjects\_Modules\V&V\tp2-q4\src\main\java\fr\istic\vv\tocheck"
+```
+
+Code présent [ici](../code/Exercise4/)
