@@ -6,14 +6,16 @@ import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
 
-public class PrivateElementsWithoutGetterPrinter extends VoidVisitorWithDefaults<Void> {
+
+public class NoPublicGettersWithPrivateElements extends VoidVisitorWithDefaults<Void> {
     private final String resultPath;
-    public PrivateElementsWithoutGetterPrinter(String path) {
-        this.resultPath =path;
+
+    public NoPublicGettersWithPrivateElements(String path) {
+        this.resultPath = path;
     }
 
     @Override
@@ -24,58 +26,63 @@ public class PrivateElementsWithoutGetterPrinter extends VoidVisitorWithDefaults
     }
 
     public void visitTypeDeclaration(TypeDeclaration<?> declaration, Void arg) {
+
         // Create result file
-        String fileName = resultPath +"result.txt";
+        String fileName = resultPath + "Output.txt";
         try {
             File file = new File(fileName);
             if (file.createNewFile()) {
-                System.out.println("File created: " + file.getName());
+                System.out.println("Created file : " + file.getName());
             } else {
                 System.out.println("File already exists");
             }
         } catch (IOException e) {
-            System.out.println("Error bitch");
             e.printStackTrace();
         }
 
-        if(!declaration.isPublic()) return;
-        List<String> variableList = new ArrayList<>();
-        List<String> issuesVariable = new ArrayList<>();
+        if (!declaration.isPublic()) return;
+
+        List<String> variablesList = new ArrayList<>();
+        List<String> listOfVariables = new ArrayList<>();
+
         // Parse all the fields to find the private ones
-        for(FieldDeclaration var : declaration.getFields()){
-            if(var.isPrivate()){
-                variableList.add(var.getVariable(0).getName().toString());
+        for (FieldDeclaration fieldDeclaration : declaration.getFields()) {
+            if (fieldDeclaration.isPrivate()) {
+                listOfVariables.add(fieldDeclaration.getVariable(0).getName().toString());
             }
         }
-        if(!variableList.isEmpty()){
-            issuesVariable = variableList;
-            System.out.println("Looking for privates fields without getters : ");
-            for(String varName : variableList){
-                for(MethodDeclaration method : declaration.getMethods()){
-                    if (method.getNameAsString().equalsIgnoreCase("get"+varName)){
-                        issuesVariable.remove(varName);
+
+
+        if (!listOfVariables.isEmpty()) {
+            variablesList = new ArrayList<>(listOfVariables);
+            System.out.println("Checking any private fields without getters : ");
+            for (String variable : listOfVariables) {
+                for (MethodDeclaration method : declaration.getMethods()) {
+                    if (method.getNameAsString().equalsIgnoreCase("get" + variable)) {
+                        variablesList.remove(variable);
                     }
                 }
             }
         }
-        if(!issuesVariable.isEmpty()){
+
+        if (!variablesList.isEmpty()) {
             try {
-                FileWriter myWriter = new FileWriter(fileName);
-                myWriter.write("The code analysis revealed " + issuesVariable.size() +" privates instances " +
-                        "variables without getters such as : \n");
-                for(String result : issuesVariable){
-                    myWriter.write(result + "\n");
+                FileWriter fileWriter = new FileWriter(fileName);
+                fileWriter.write("The analysis revealed " + variablesList.size() + " privates variables " +
+                        "without getters : \n");
+                for (String result : variablesList) {
+                    fileWriter.write(result + "\n");
                 }
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
+                fileWriter.close();
+                System.out.println("File written.");
             } catch (IOException e) {
-                System.out.println("An error occurred.");
+                System.out.println("Error I/O during writing or closing.");
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
+        @Override
     public void visit(ClassOrInterfaceDeclaration declaration, Void arg) {
         visitTypeDeclaration(declaration, arg);
     }
